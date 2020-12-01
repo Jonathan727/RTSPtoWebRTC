@@ -22,12 +22,13 @@ func serveHTTP() {
 	router := gin.Default()
 	router.LoadHTMLGlob("web/templates/*")
 	router.GET("/", func(c *gin.Context) {
-		fi, all := Config.list()
-		sort.Strings(all)
+		firstStream, allStreams := Config.list()
+		var defaultStream = firstStream
+		sort.Strings(allStreams)
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
 			"port":     Config.Server.HTTPPort,
-			"suuid":    fi,
-			"suuidMap": all,
+			"suuid":    defaultStream,
+			"suuidMap": allStreams,
 			"version":  time.Now().String(),
 		})
 	})
