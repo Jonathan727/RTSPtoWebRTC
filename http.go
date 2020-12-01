@@ -61,6 +61,7 @@ func serveHTTP() {
 		}
 	})
 	router.StaticFS("/static", http.Dir("web/static"))
+	log.Printf("Open http://localhost%s to access this application", Config.Server.HTTPPort)
 	err := router.Run(Config.Server.HTTPPort)
 	if err != nil {
 		log.Fatalln("Start HTTP Server error", err)
