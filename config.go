@@ -33,6 +33,7 @@ type StreamST struct {
 }
 
 type viewer struct {
+	// client channel that receives multimedia packets
 	c chan av.Packet
 }
 
@@ -53,6 +54,7 @@ func loadConfig() *ConfigST {
 	return &tmp
 }
 
+// Sends a received packet to all connected clients
 func (c *ConfigST) streamCast(uuid string, pck av.Packet) {
 	for _, v := range c.Streams[uuid].Viewers {
 		if len(v.c) < cap(v.c) {
@@ -66,16 +68,19 @@ func (c *ConfigST) streamExists(suuid string) bool {
 	return ok
 }
 
+// Add a camera connection
 func (c *ConfigST) streamAdd(suuid string, codecs []av.CodecData) {
 	t := c.Streams[suuid]
 	t.Codecs = codecs
 	c.Streams[suuid] = t
 }
 
+// Get a connection
 func (c *ConfigST) streamGet(suuid string) []av.CodecData {
 	return c.Streams[suuid].Codecs
 }
 
+// Client Add
 func (c *ConfigST) viewerAdd(suuid string) (string, chan av.Packet) {
 	vuuid := pseudoUUID()
 	ch := make(chan av.Packet, 100)
