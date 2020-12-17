@@ -83,18 +83,17 @@ func (c *ConfigST) viewerAdd(suuid string) (string, chan av.Packet) {
 	return vuuid, ch
 }
 
-func (c *ConfigST) list() (string, []string) {
-	var res []string
-	var fist string
+func (c *ConfigST) streamList() (first string, all []string) {
 	for s := range c.Streams {
-		if fist == "" {
-			fist = s
+		if first == "" {
+			first = s
 		}
-		res = append(res, s)
+		all = append(all, s)
 	}
-	return fist, res
+	return first, all
 }
-func (c *ConfigST) clDe(suuid, vuuid string) {
+
+func (c *ConfigST) viewerRemove(suuid, vuuid string) {
 	delete(c.Streams[suuid].Viewers, vuuid)
 }
 

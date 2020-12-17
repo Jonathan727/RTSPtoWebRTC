@@ -33,7 +33,7 @@ func serveHTTP() {
 		})
 	})
 	router.GET("/player/:suuid", func(c *gin.Context) {
-		_, all := Config.list()
+		_, all := Config.streamList()
 		sort.Strings(all)
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
 			"port":     Config.Server.HTTPPort,
@@ -245,7 +245,7 @@ func receiver(c *gin.Context) {
 					log.Println("start stream", suuid, "client", vuuid)
 					defer func() {
 						log.Println("stop stream", suuid, "client", vuuid)
-						defer Config.clDe(suuid, vuuid)
+						defer Config.viewerRemove(suuid, vuuid)
 					}()
 					var Vpre time.Duration
 					var start bool
