@@ -247,7 +247,7 @@ func receiver(c *gin.Context) {
 						log.Println("stop stream", suuid, "client", vuuid)
 						defer Config.viewerRemove(suuid, vuuid)
 					}()
-					var Vpre time.Duration
+					var previousPacketTime time.Duration
 					var start bool
 					timer1.Reset(5 * time.Second)
 					for {
@@ -271,17 +271,17 @@ func receiver(c *gin.Context) {
 							} else {
 								pck.Data = pck.Data[4:]
 							}
-							var Vts time.Duration
+							var bufferDuration time.Duration
 							if pck.Idx == 0 && videoTrack != nil {
-								if Vpre != 0 {
-									Vts = pck.Time - Vpre
+								if previousPacketTime != 0 {
+									bufferDuration = pck.Time - previousPacketTime
 								}
-								samples := uint32(90000 / 1000 * Vts.Milliseconds())
+								samples := uint32(90000 / 1000 * bufferDuration.Milliseconds())
 								err := videoTrack.WriteSample(media.Sample{Data: pck.Data, Samples: samples})
 								if err != nil {
 									return
 								}
-								Vpre = pck.Time
+								previousPacketTime = pck.Time
 							} else if pck.Idx == 1 && audioTrack != nil {
 								err := audioTrack.WriteSample(media.Sample{Data: pck.Data, Samples: uint32(len(pck.Data))})
 								if err != nil {
