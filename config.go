@@ -26,10 +26,10 @@ type ServerST struct {
 
 //StreamST struct
 type StreamST struct {
-	URL    string `json:"url"`
-	Status bool   `json:"status"`
-	Codecs []av.CodecData
-	Cl     map[string]viewer
+	URL     string `json:"url"`
+	Status  bool   `json:"status"`
+	Codecs  []av.CodecData
+	Viewers map[string]viewer
 }
 
 type viewer struct {
@@ -46,15 +46,15 @@ func loadConfig() *ConfigST {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	for i, v := range tmp.Streams {
-		v.Cl = make(map[string]viewer)
-		tmp.Streams[i] = v
+	for i, st := range tmp.Streams {
+		st.Viewers = make(map[string]viewer)
+		tmp.Streams[i] = st
 	}
 	return &tmp
 }
 
 func (c *ConfigST) cast(uuid string, pck av.Packet) {
-	for _, v := range c.Streams[uuid].Cl {
+	for _, v := range c.Streams[uuid].Viewers {
 		if len(v.c) < cap(v.c) {
 			v.c <- pck
 		}
@@ -79,7 +79,7 @@ func (c *ConfigST) coGe(suuid string) []av.CodecData {
 func (c *ConfigST) clAd(suuid string) (string, chan av.Packet) {
 	cuuid := pseudoUUID()
 	ch := make(chan av.Packet, 100)
-	c.Streams[suuid].Cl[cuuid] = viewer{c: ch}
+	c.Streams[suuid].Viewers[cuuid] = viewer{c: ch}
 	return cuuid, ch
 }
 
@@ -95,7 +95,7 @@ func (c *ConfigST) list() (string, []string) {
 	return fist, res
 }
 func (c *ConfigST) clDe(suuid, cuuid string) {
-	delete(c.Streams[suuid].Cl, cuuid)
+	delete(c.Streams[suuid].Viewers, cuuid)
 }
 
 func pseudoUUID() (uuid string) {
