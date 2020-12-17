@@ -29,9 +29,10 @@ type StreamST struct {
 	URL    string `json:"url"`
 	Status bool   `json:"status"`
 	Codecs []av.CodecData
-	Cl     map[string]viwer
+	Cl     map[string]viewer
 }
-type viwer struct {
+
+type viewer struct {
 	c chan av.Packet
 }
 
@@ -46,7 +47,7 @@ func loadConfig() *ConfigST {
 		log.Fatalln(err)
 	}
 	for i, v := range tmp.Streams {
-		v.Cl = make(map[string]viwer)
+		v.Cl = make(map[string]viewer)
 		tmp.Streams[i] = v
 	}
 	return &tmp
@@ -78,7 +79,7 @@ func (element *ConfigST) coGe(suuid string) []av.CodecData {
 func (element *ConfigST) clAd(suuid string) (string, chan av.Packet) {
 	cuuid := pseudoUUID()
 	ch := make(chan av.Packet, 100)
-	element.Streams[suuid].Cl[cuuid] = viwer{c: ch}
+	element.Streams[suuid].Cl[cuuid] = viewer{c: ch}
 	return cuuid, ch
 }
 
