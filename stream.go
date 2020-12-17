@@ -31,14 +31,14 @@ func serveStreams() {
 					time.Sleep(5 * time.Second)
 					continue
 				}
-				Config.coAd(name, codec)
+				Config.streamAdd(name, codec)
 				for {
 					pkt, err := session.ReadPacket()
 					if err != nil {
 						log.Println(name, err)
 						break
 					}
-					Config.cast(name, pkt)
+					Config.streamCast(name, pkt)
 				}
 				err = session.Close()
 				if err != nil {

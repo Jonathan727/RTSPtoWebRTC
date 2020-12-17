@@ -53,7 +53,7 @@ func loadConfig() *ConfigST {
 	return &tmp
 }
 
-func (c *ConfigST) cast(uuid string, pck av.Packet) {
+func (c *ConfigST) streamCast(uuid string, pck av.Packet) {
 	for _, v := range c.Streams[uuid].Viewers {
 		if len(v.c) < cap(v.c) {
 			v.c <- pck
@@ -61,41 +61,41 @@ func (c *ConfigST) cast(uuid string, pck av.Packet) {
 	}
 }
 
-func (c *ConfigST) ext(suuid string) bool {
+func (c *ConfigST) streamExists(suuid string) bool {
 	_, ok := c.Streams[suuid]
 	return ok
 }
 
-func (c *ConfigST) coAd(suuid string, codecs []av.CodecData) {
+func (c *ConfigST) streamAdd(suuid string, codecs []av.CodecData) {
 	t := c.Streams[suuid]
 	t.Codecs = codecs
 	c.Streams[suuid] = t
 }
 
-func (c *ConfigST) coGe(suuid string) []av.CodecData {
+func (c *ConfigST) streamGet(suuid string) []av.CodecData {
 	return c.Streams[suuid].Codecs
 }
 
-func (c *ConfigST) clAd(suuid string) (string, chan av.Packet) {
-	cuuid := pseudoUUID()
+func (c *ConfigST) viewerAdd(suuid string) (string, chan av.Packet) {
+	vuuid := pseudoUUID()
 	ch := make(chan av.Packet, 100)
-	c.Streams[suuid].Viewers[cuuid] = viewer{c: ch}
-	return cuuid, ch
+	c.Streams[suuid].Viewers[vuuid] = viewer{c: ch}
+	return vuuid, ch
 }
 
 func (c *ConfigST) list() (string, []string) {
 	var res []string
 	var fist string
-	for k := range c.Streams {
+	for s := range c.Streams {
 		if fist == "" {
-			fist = k
+			fist = s
 		}
-		res = append(res, k)
+		res = append(res, s)
 	}
 	return fist, res
 }
-func (c *ConfigST) clDe(suuid, cuuid string) {
-	delete(c.Streams[suuid].Viewers, cuuid)
+func (c *ConfigST) clDe(suuid, vuuid string) {
+	delete(c.Streams[suuid].Viewers, vuuid)
 }
 
 func pseudoUUID() (uuid string) {

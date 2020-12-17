@@ -45,8 +45,8 @@ func serveHTTP() {
 	router.POST("/receive", receiver)
 	router.GET("/codec/:uuid", func(c *gin.Context) {
 		c.Header("Access-Control-Allow-Origin", "*")
-		if Config.ext(c.Param("uuid")) {
-			codecs := Config.coGe(c.Param("uuid"))
+		if Config.streamExists(c.Param("uuid")) {
+			codecs := Config.streamGet(c.Param("uuid"))
 			if codecs == nil {
 				return
 			}
@@ -72,13 +72,13 @@ func receiver(c *gin.Context) {
 	data := c.PostForm("data")
 	suuid := c.PostForm("suuid")
 	log.Println("Request", suuid)
-	if Config.ext(suuid) {
+	if Config.streamExists(suuid) {
 		/*
 
 			Get Codecs INFO
 
 		*/
-		codecs := Config.coGe(suuid)
+		codecs := Config.streamGet(suuid)
 		if codecs == nil {
 			log.Println("Codec error")
 			return
@@ -241,11 +241,11 @@ func receiver(c *gin.Context) {
 			}
 			if connectionState == webrtc.ICEConnectionStateConnected {
 				go func() {
-					cuuid, ch := Config.clAd(suuid)
-					log.Println("start stream", suuid, "client", cuuid)
+					vuuid, ch := Config.viewerAdd(suuid)
+					log.Println("start stream", suuid, "client", vuuid)
 					defer func() {
-						log.Println("stop stream", suuid, "client", cuuid)
-						defer Config.clDe(suuid, cuuid)
+						log.Println("stop stream", suuid, "client", vuuid)
+						defer Config.clDe(suuid, vuuid)
 					}()
 					var Vpre time.Duration
 					var start bool
