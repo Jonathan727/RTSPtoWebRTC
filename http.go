@@ -267,7 +267,6 @@ func receiver(c *gin.Context) {
 							}
 							if pck.IsKeyFrame {
 								pck.Data = append([]byte("\000\000\001"+string(sps)+"\000\000\001"+string(pps)+"\000\000\001"), pck.Data[4:]...)
-
 							} else {
 								pck.Data = pck.Data[4:]
 							}
